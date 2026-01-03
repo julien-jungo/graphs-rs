@@ -263,3 +263,58 @@ fn main() {
     assert_eq!(true, list.is_empty());
     assert_eq!(0, list.size());
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_list_behaviour() {
+        let mut list: LinkedList<i32> = LinkedList::new();
+
+        assert!(list.is_empty());
+        assert_eq!(0, list.size());
+        assert_eq!(None, list.remove_first());
+        assert_eq!(None, list.remove_last());
+    }
+
+    #[test]
+    fn add_and_remove_first_last() {
+        let mut list = LinkedList::new();
+
+        list.add_last(1);
+        list.add_last(2);
+        list.add_first(0);
+
+        let mut it = list.iter();
+
+        assert_eq!(it.next(), Some(&0));
+        assert_eq!(it.next(), Some(&1));
+        assert_eq!(it.next(), Some(&2));
+        assert_eq!(it.next(), None);
+
+        assert_eq!(Some(0), list.remove_first());
+        assert_eq!(Some(2), list.remove_last());
+        assert_eq!(Some(1), list.remove_first());
+        assert_eq!(None, list.remove_first());
+    }
+
+    #[test]
+    fn free_slot_reuse() {
+        let mut list = LinkedList::new();
+
+        list.add_last(10);
+        list.add_last(20);
+        list.add_last(30);
+
+        assert_eq!(Some(10), list.remove_first());
+        assert_eq!(Some(20), list.remove_first());
+
+        list.add_last(40);
+        list.add_first(0);
+
+        let vals: Vec<_> = list.iter().copied().collect();
+
+        assert_eq!(vals, vec![0, 30, 40]);
+    }
+}
