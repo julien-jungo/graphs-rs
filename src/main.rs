@@ -244,24 +244,12 @@ impl<T> LinkedList<T> {
 fn main() {
     let mut list: LinkedList<&str> = LinkedList::new();
 
-    println!("{}", list.is_empty());
-    println!("{}", list.size());
-
     list.add_last("Hello");
     list.add_last("World");
-
-    println!("{}", list.is_empty());
-    println!("{}", list.size());
 
     for item in &list {
         println!("{item}");
     }
-
-    assert_eq!("Hello", list.remove_first().unwrap());
-    assert_eq!("World", list.remove_first().unwrap());
-    assert_eq!(None, list.remove_first());
-    assert_eq!(true, list.is_empty());
-    assert_eq!(0, list.size());
 }
 
 #[cfg(test)]
