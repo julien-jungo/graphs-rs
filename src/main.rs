@@ -144,7 +144,8 @@ impl<T> LinkedList<T> {
                 self.head = Some(new_head);
                 self.tail = Some(new_head);
             },
-            Some(_) => {
+            Some(old_head) => {
+                self.slots[old_head].as_used_mut().prev = Some(new_head);
                 self.head = Some(new_head);
             }
         }
@@ -165,7 +166,8 @@ impl<T> LinkedList<T> {
                 self.tail = Some(new_tail);
             },
             Some(old_tail) => {
-                self.slots[old_tail].as_used_mut().next = Some(new_tail)
+                self.slots[old_tail].as_used_mut().next = Some(new_tail);
+                self.tail = Some(new_tail);
             }
         }
     }
@@ -174,8 +176,13 @@ impl<T> LinkedList<T> {
         self.head.map(|pos| {
             self.head = self.slots[pos].as_used().next;
 
-            if self.head.is_none() {
-                self.tail = None;
+            match self.head {
+                None => {
+                    self.tail = None;
+                }
+                Some(new_head) => {
+                    self.slots[new_head].as_used_mut().prev = None;
+                }
             }
 
             let slot = mem::replace(
@@ -194,8 +201,13 @@ impl<T> LinkedList<T> {
         self.tail.map(|pos| {
             self.tail = self.slots[pos].as_used().prev;
 
-            if self.tail.is_none() {
-                self.head = None;
+            match self.tail {
+                None => {
+                    self.head = None;
+                }
+                Some(new_tail) => {
+                    self.slots[new_tail].as_used_mut().next = None;
+                }
             }
 
             let slot = mem::replace(
